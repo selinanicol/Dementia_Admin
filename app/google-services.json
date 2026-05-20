@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "133742309621",
+    "project_id": "dementia-b4ac2",
+    "storage_bucket": "dementia-b4ac2.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:133742309621:android:18c398cc0c146eeb84d5bc",
+        "android_client_info": {
+          "package_name": "com.example.dementia_admin"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyASdY5LLcYp_2i5Yzyazu1lCgdAp-FmFho"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
