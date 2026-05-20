@@ -22,7 +22,8 @@ data class Medication(
     val date: String = "",
     val recurrence: String = "",
     val status: String = "ausstehend",
-    val imageUrl: String = ""
+    val imageUrl: String = "",
+    val notes: String? = null
 )
 
 data class MedicationTask(
