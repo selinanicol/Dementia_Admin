@@ -75,7 +75,6 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
-import java.util.UUID
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -102,7 +101,6 @@ fun AdminDashboard(navController: NavController, selectedPatientId: String) {
                 for (child in snapshot.children) {
                     val rawMed = child.getValue(Medication::class.java) ?: continue
 
-                    // 🔓 Entschlüsseln, bevor wir damit weiterarbeiten!
                     val med = rawMed.copy(
                         name = CryptoHelper.decrypt(rawMed.name),
                         instructions = CryptoHelper.decrypt(rawMed.instructions)

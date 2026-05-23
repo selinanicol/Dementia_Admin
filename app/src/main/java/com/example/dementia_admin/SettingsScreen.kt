@@ -3,6 +3,7 @@ package com.example.dementia_admin
 import android.content.Context
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -37,11 +38,11 @@ import java.util.Locale
 
 val Context.dataStore by preferencesDataStore(name = "settings")
 val PUSH_ENABLED = booleanPreferencesKey("push_enabled")
-val SOUND_ENABLED = booleanPreferencesKey("sound_enabled") // Zweiter Key für die Töne
+val SOUND_ENABLED = booleanPreferencesKey("sound_enabled")
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsScreen(navController: NavController) {
+fun SettingsScreen(navController: NavController) { // 🌐 Keine Parameter-Übergabe mehr nötig!
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 
@@ -55,7 +56,7 @@ fun SettingsScreen(navController: NavController) {
             CenterAlignedTopAppBar(
                 title = { Text("Einstellungen", fontWeight = FontWeight.Bold) },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = ModernBrandColor, // Zieht die Farbe automatisch aus der MainActivity
+                    containerColor = ModernBrandColor,
                     titleContentColor = Color.White
                 )
             )
@@ -118,7 +119,7 @@ fun SettingsScreen(navController: NavController) {
                                 }
                             },
                             colors = SwitchDefaults.colors(checkedTrackColor = ModernBrandColor),
-                            enabled = pushEnabled // Ton-Schalter nur aktiv, wenn Push aktiv ist
+                            enabled = pushEnabled
                         )
                     }
                 }
@@ -137,7 +138,6 @@ fun SettingsScreen(navController: NavController) {
                 Row(
                     modifier = Modifier.fillMaxWidth().clickable {
                         val db = FirebaseDatabase.getInstance("https://dementia-b4ac2-default-rtdb.europe-west1.firebasedatabase.app/").reference
-
                         val currentUserId = FirebaseAuth.getInstance().currentUser?.uid ?: "unknown"
 
                         db.child("patients").child(currentUserId).child("medications").get().addOnSuccessListener { snapshot ->
@@ -153,7 +153,7 @@ fun SettingsScreen(navController: NavController) {
                             if (medicationList.isNotEmpty()) {
                                 exportDataToDoctor(context, medicationList)
                             } else {
-                                android.widget.Toast.makeText(context, "Keine Daten zum Exportieren gefunden.", android.widget.Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, "Keine Daten zum Exportieren gefunden.", Toast.LENGTH_SHORT).show()
                             }
                         }
                     }.padding(16.dp),
@@ -183,12 +183,11 @@ fun SettingsScreen(navController: NavController) {
 }
 
 fun exportDataToDoctor(context: Context, medicationList: List<Medication>) {
-    val erledigtCount = medicationList.count { it.status.lowercase() == "erledigt" }
-    val verpasstCount = medicationList.count { it.status.lowercase() == "verpasst" }
+    val erledigtCount = medicationList.count { it.status.trim().equals("erledigt", ignoreCase = true) }
+    val verpasstCount = medicationList.size - erledigtCount
 
     val currentTimestamp = SimpleDateFormat("dd.MM.yyyy", Locale.GERMANY).format(Date())
 
-    // HTML/Css styled PDF
     val htmlBuilder = StringBuilder()
     htmlBuilder.append("""
         <!DOCTYPE html>
@@ -220,7 +219,6 @@ fun exportDataToDoctor(context: Context, medicationList: List<Medication>) {
             .badge { display: inline-block; padding: 3px 6px; font-size: 11px; font-weight: bold; border-radius: 4px; }
             .status-erledigt { background-color: #dcfce7; color: #15803d; }
             .status-verpasst { background-color: #fee2e2; color: #b91c1c; }
-            .notes { font-style: italic; color: #64748b; }
         </style>
         </head>
         <body>
@@ -265,17 +263,17 @@ fun exportDataToDoctor(context: Context, medicationList: List<Medication>) {
                 <tbody>
     """.trimIndent())
 
-    // fill with data
     medicationList.forEach { med ->
         val isErledigt = med.status.lowercase() == "erledigt"
         val badgeClass = if (isErledigt) "status-erledigt" else "status-verpasst"
         val badgeLabel = if (isErledigt) "Erledigt" else "Verpasst"
-        val notesText = med.notes ?: "-"
+
+        val entschluesselterName = CryptoHelper.decrypt(med.name)
 
         htmlBuilder.append("""
             <tr>
                 <td>${med.date} &ndash; ${med.time} Uhr</td>
-                <td style="font-weight: 500;">${med.name}</td>
+                <td style="font-weight: 500;">$entschluesselterName</td>
                 <td><span class="badge $badgeClass">$badgeLabel</span></td>
             </tr>
         """.trimIndent())
@@ -283,18 +281,15 @@ fun exportDataToDoctor(context: Context, medicationList: List<Medication>) {
 
     htmlBuilder.append("</tbody></table></body></html>")
 
-    // printManager
     val webView = WebView(context)
     webView.webViewClient = object : WebViewClient() {
         override fun onPageFinished(view: WebView?, url: String?) {
             val printManager = context.getSystemService(Context.PRINT_SERVICE) as PrintManager
-            val printAdapter = webView.createPrintDocumentAdapter("Medikamentenbericht_\$currentTimestamp")
-
+            val printAdapter = webView.createPrintDocumentAdapter("Medikamentenbericht_$currentTimestamp")
             val jobName = "Medikamentenbericht_Patient"
             printManager.print(jobName, printAdapter, PrintAttributes.Builder().build())
         }
     }
 
-    // render PDF
     webView.loadDataWithBaseURL(null, htmlBuilder.toString(), "text/html", "utf-8", null)
 }

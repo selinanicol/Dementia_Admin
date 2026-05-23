@@ -6,7 +6,6 @@ import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
 
 object CryptoHelper {
-    // Für den Prototyp einen statischen 32-Zeichen Schlüssel.
     private const val SECRET_KEY = "MeineGeheimeDemenzAppSchluessel!"
     private const val INIT_VECTOR = "RandomInitVector" // 16 Zeichen
 
@@ -21,7 +20,7 @@ object CryptoHelper {
             val encrypted = cipher.doFinal(value.toByteArray())
             Base64.encodeToString(encrypted, Base64.DEFAULT)
         } catch (ex: Exception) {
-            value // Fallback: Wenn was schiefgeht, Klartext zurückgeben (Nur für Prototyp)
+            value
         }
     }
 
