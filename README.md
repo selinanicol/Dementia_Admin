@@ -1,4 +1,4 @@
-# Demenz-Assistent – Admin- & Angehörigen-App
+# Dementia – Admin- & Angehörigen-App
 
 > **Status:** Prototyp (Iteration 2 / Beta)  
 > **Zielgruppe:** Angehörige, Betreuer und Pflegekräfte  
