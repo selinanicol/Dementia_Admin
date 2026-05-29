@@ -65,6 +65,8 @@ class MainActivity : FragmentActivity() {
     }
 }
 
+
+// for safety a Biometric-Scanner every time the App gets started
 @Composable
 fun BiometricSecurityWrapper(activity: FragmentActivity, content: @Composable () -> Unit) {
     var isAuthenticated by remember { mutableStateOf(false) }
@@ -92,7 +94,7 @@ fun BiometricSecurityWrapper(activity: FragmentActivity, content: @Composable ()
     if (isAuthenticated) {
         content()
     } else {
-        // Sperrbildschirm, falls der Dialog weggeklickt wurd
+        // Sperrbildschirm, falls der Dialog weggeklickt wurde
         Column(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,

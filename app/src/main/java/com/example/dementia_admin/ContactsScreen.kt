@@ -65,11 +65,10 @@ fun ContactsScreen(navController: NavController, patientId: String) {
     val context = LocalContext.current
     var contacts by remember { mutableStateOf(emptyList<CareContact>()) }
 
-    // DYNAMISCHE ID abfragen
+    // dynamische id abfragen
     val currentUserId = FirebaseAuth.getInstance().currentUser?.uid ?: "unknown"
 
     DisposableEffect(currentUserId) {
-        // Pfad mit currentUserId aktualisiert!
         val dbRef = FirebaseDatabase.getInstance("https://dementia-b4ac2-default-rtdb.europe-west1.firebasedatabase.app/").reference
             .child("patients").child(currentUserId).child("contacts")
 
@@ -135,10 +134,9 @@ fun AddEditContactScreen(navController: NavController, patientId: String, contac
     var role by remember { mutableStateOf("") }
     var phone by remember { mutableStateOf("") }
 
-    // DYNAMISCHE ID abfragen
+    // dynamische id abfragen
     val currentUserId = FirebaseAuth.getInstance().currentUser?.uid ?: "unknown"
 
-    // Pfad mit currentUserId aktualisiert!
     val dbRef = FirebaseDatabase.getInstance("https://dementia-b4ac2-default-rtdb.europe-west1.firebasedatabase.app/").reference
         .child("patients").child(currentUserId).child("contacts")
 

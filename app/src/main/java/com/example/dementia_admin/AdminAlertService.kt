@@ -81,7 +81,7 @@ class AdminAlertService : Service() {
         val notification = NotificationCompat.Builder(this, ALARM_CHANNEL_ID)
             .setSmallIcon(android.R.drawable.ic_dialog_alert)
             .setContentTitle("NOTFALL: Medikament verpasst!")
-            .setContentText("Dein Angehöriger hat ${med.name} nicht genommen!")
+            .setContentText("Dein Angehöriger hat ein Medikament nicht genommen!")
             .setPriority(NotificationCompat.PRIORITY_MAX)
             .setCategory(NotificationCompat.CATEGORY_ALARM)
             .setVibrate(vibrationPattern)

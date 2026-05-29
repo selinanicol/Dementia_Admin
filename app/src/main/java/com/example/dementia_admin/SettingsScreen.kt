@@ -42,7 +42,7 @@ val SOUND_ENABLED = booleanPreferencesKey("sound_enabled")
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsScreen(navController: NavController) { // 🌐 Keine Parameter-Übergabe mehr nötig!
+fun SettingsScreen(navController: NavController) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 

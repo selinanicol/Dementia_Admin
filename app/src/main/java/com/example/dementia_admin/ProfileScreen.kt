@@ -47,7 +47,7 @@ import com.google.firebase.database.ValueEventListener
 @Composable
 fun ProfileScreen(navController: NavController, selectedPatientId: String, onPatientSelected: (String) -> Unit) {
     var patients by remember { mutableStateOf(emptyList<Patient>()) }
-    val auth = FirebaseAuth.getInstance() // NEU: Für den Logout benötigt
+    val auth = FirebaseAuth.getInstance() // für logout
 
     LaunchedEffect(Unit) {
         val dbRef = FirebaseDatabase.getInstance("https://dementia-b4ac2-default-rtdb.europe-west1.firebasedatabase.app/").reference.child("patients")
@@ -93,9 +93,9 @@ fun ProfileScreen(navController: NavController, selectedPatientId: String, onPat
                 }
             }
 
-            Spacer(modifier = Modifier.weight(1f)) // Schiebt den Logout-Button nach ganz unten
+            Spacer(modifier = Modifier.weight(1f))
 
-            // --- NEU: LOGOUT BUTTON IM PROFIL ---
+            // logo in Profile
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(containerColor = Color.White),

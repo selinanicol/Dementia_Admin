@@ -62,6 +62,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -84,7 +85,6 @@ fun AdminDashboard(navController: NavController, selectedPatientId: String) {
     var tasks by remember { mutableStateOf(emptyList<MedicationTask>()) }
     var isEditMode by remember { mutableStateOf(false) }
 
-    // DYNAMISCHE ID für die Datenbankabfrage
     val currentUserId = FirebaseAuth.getInstance().currentUser?.uid ?: "unknown"
 
     DisposableEffect(selectedDate, currentUserId) {
@@ -136,13 +136,25 @@ fun AdminDashboard(navController: NavController, selectedPatientId: String) {
             CenterAlignedTopAppBar(
                 title = {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(imageVector = Icons.Default.Favorite, contentDescription = "Logo", modifier = Modifier.size(28.dp)) // LOGO PLATZHALTER
+                        androidx.compose.foundation.Image(
+                            painter = painterResource(id = R.drawable.app_logo),
+                            contentDescription = "App Logo",
+                            modifier = Modifier.size(32.dp)
+                        )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text("Plan", fontWeight = FontWeight.Bold, fontSize = 22.sp)
                     }
                 },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = ModernBrandColor, titleContentColor = Color.White, actionIconContentColor = Color.White),
-                actions = { IconButton(onClick = { isEditMode = !isEditMode }) { Icon(imageVector = if (isEditMode) Icons.Default.Check else Icons.Default.Edit, contentDescription = "Bearbeiten") } }
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = ModernBrandColor,
+                    titleContentColor = Color.White,
+                    actionIconContentColor = Color.White
+                ),
+                actions = {
+                    IconButton(onClick = { isEditMode = !isEditMode }) {
+                        Icon(imageVector = if (isEditMode) Icons.Default.Check else Icons.Default.Edit, contentDescription = "Bearbeiten")
+                    }
+                }
             )
         },
         floatingActionButton = {
@@ -153,7 +165,7 @@ fun AdminDashboard(navController: NavController, selectedPatientId: String) {
     ) { padding ->
         Column(modifier = Modifier.padding(padding).padding(16.dp).fillMaxSize()) {
 
-            // --- DYNAMISCHE STATUS-KARTE ---
+            // Status
             val hasMissedTask = tasks.any { it.status == "verpasst" }
             val lastCompletedTask = tasks.filter { it.status == "erledigt" }.maxByOrNull { it.time }
             Card(
@@ -367,11 +379,6 @@ fun AddEditMedicationScreen(navController: NavController, patientId: String, med
             )
             Spacer(modifier = Modifier.height(32.dp))
 
-
-            // neu eingefügt
-
-            // LÖSCHEN & SPEICHERN
-            // LÖSCHEN & SPEICHERN
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
@@ -394,16 +401,13 @@ fun AddEditMedicationScreen(navController: NavController, patientId: String, med
 
                 Button(
                     onClick = {
-                        // 1. Zuerst die Texte verschlüsseln!
                         val encryptedName = CryptoHelper.encrypt(name)
                         val encryptedInstructions = CryptoHelper.encrypt(instructions)
 
-                        // 2. ID generieren
                         val targetId =
                             if (isEdit) medId else dbRef.push().key ?: java.util.UUID.randomUUID()
                                 .toString()
 
-                        // 3. Prüfen ob ein Foto ausgewählt wurde (aus dem vorherigen Schritt)
                         if (imageUri != null) {
                             // Foto hochladen
                             val storageRef =
@@ -411,9 +415,7 @@ fun AddEditMedicationScreen(navController: NavController, patientId: String, med
                                     "medication_images"
                                 ).child("$targetId.jpg")
                             storageRef.putFile(imageUri!!).addOnSuccessListener {
-                                // Link zum Bild holen
                                 storageRef.downloadUrl.addOnSuccessListener { downloadUrl ->
-                                    // Alles zusammen speichern (mit verschlüsseltem Namen & Bild-URL)
                                     val medWithImage = Medication(
                                         targetId,
                                         encryptedName,
@@ -429,7 +431,6 @@ fun AddEditMedicationScreen(navController: NavController, patientId: String, med
                                 }
                             }
                         } else {
-                            // Ohne Foto speichern (aber trotzdem verschlüsselt!)
                             val medWithoutImage = Medication(
                                 targetId,
                                 encryptedName,
